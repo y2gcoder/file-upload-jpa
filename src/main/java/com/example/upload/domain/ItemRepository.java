@@ -1,22 +1,11 @@
 package com.example.upload.domain;
 
-import org.springframework.stereotype.Repository;
+import org.springframework.data.repository.Repository;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Optional;
 
-@Repository
-public class ItemRepository {
-    private final Map<Long, Item> store = new HashMap<>();
-    private long sequence = 0L;
+public interface ItemRepository extends Repository<Item, Long> {
+    void save(Item item);
 
-    public Item save(Item item) {
-        item.setId(++sequence);
-        store.put(item.getId(), item);
-        return item;
-    }
-
-    public Item findById(Long id) {
-        return store.get(id);
-    }
+    Optional<Item> findById(Long id);
 }

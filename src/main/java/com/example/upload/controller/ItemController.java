@@ -40,10 +40,7 @@ public class ItemController {
         List<UploadFile> storeImageFiles = fileStore.storeFiles(form.getImageFiles());
 
         //데이터베이스에 저장
-        Item item = new Item();
-        item.setItemName(form.getItemName());
-        item.setAttachFile(attachFile);
-        item.setImageFiles(storeImageFiles);
+        Item item = new Item(form.getItemName(), attachFile, storeImageFiles);
         itemRepository.save(item);
 
         redirectAttributes.addAttribute("itemId", item.getId());
@@ -53,7 +50,7 @@ public class ItemController {
 
     @GetMapping("/items/{id}")
     public String items(@PathVariable Long id, Model model) {
-        Item item = itemRepository.findById(id);
+        Item item = itemRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("NOT FOUND ITEM :" + id));
         model.addAttribute("item", item);
         return "item-view";
     }
@@ -66,7 +63,8 @@ public class ItemController {
 
     @GetMapping("/attach/{itemId}")
     public ResponseEntity<Resource> downloadAttach(@PathVariable Long itemId) throws MalformedURLException {
-        Item item = itemRepository.findById(itemId);
+        Item item = itemRepository.findById(itemId)
+                .orElseThrow(() -> new IllegalArgumentException("NOT FOUND ITEM :" + itemId));
         String storeFileName = item.getAttachFile().getStoreFileName();
         String uploadFileName = item.getAttachFile().getUploadFileName();
 
